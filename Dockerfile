@@ -3,10 +3,10 @@ FROM rust:latest as builder
 RUN USER=root cargo new --bin gpsfitnessapp
 WORKDIR ./gpsfitnessapp
 COPY ./Cargo.toml ./Cargo.toml
-RUN cargo build --release
-RUN rm src/*.rs
+# RUN cargo build --release
+# RUN rm src/*.rs
 
-ADD . ./
+COPY . ./
 
 #RUN rm ./target/release/deps/rust_docker_web*
 RUN cargo build --release
