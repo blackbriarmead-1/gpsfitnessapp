@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 tokio = { version = "0.2", features = ["macros", "rt-threaded"] }
 warp = "0.2"
+mongodb = "2.3.1"
