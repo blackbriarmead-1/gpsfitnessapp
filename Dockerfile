@@ -17,6 +17,7 @@ ARG APP=/usr/src/app
 
 RUN apt-get update \
     && apt-get install -y ca-certificates tzdata \
+    && apt-get -y install curl \ 
     && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 8000

@@ -6,6 +6,12 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
+    healthcheck:
+      test: curl --fail http://localhost:8000/health || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
   mongodb:
     image: mongo:latest
     ports:
