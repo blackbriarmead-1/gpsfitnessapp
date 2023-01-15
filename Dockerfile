@@ -1,4 +1,4 @@
-FROM rust:latest as builder
+FROM rust:1.66.1 as builder
 
 RUN USER=root cargo new --bin gpsfitnessapp
 WORKDIR ./gpsfitnessapp
@@ -12,7 +12,7 @@ COPY . ./
 RUN cargo build --release
 
 
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 ARG APP=/usr/src/app
 
 RUN apt-get update \

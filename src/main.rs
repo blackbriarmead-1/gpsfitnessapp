@@ -1,13 +1,20 @@
 //https://blog.logrocket.com/packaging-a-rust-web-service-using-docker/
 //docker build -t rust-debian -f Dockerfile .
 
-use mongodb;
+use mongodb::{self, Client};
 use warp::{Filter, Rejection, Reply};
 
 type Result<T> = std::result::Result<T, Rejection>;
 
 #[tokio::main]
 async fn main() {
+    let client = Client::with_uri_str("mongodb://localhost:27017")
+        .await
+        .expect("unable to connect to database");
+
+    let database = client.database("test");
+    println!("database name: {}", database.name());
+
     let health_route = warp::path!("health").and_then(health_handler);
 
     let retrieve_activity_route =
@@ -28,7 +35,12 @@ async fn health_handler() -> Result<impl Reply> {
 }
 
 async fn retrieve_activity_handler() -> Result<impl Reply> {
-    Ok("OK")
+    //let test_collection = client.database("test").collection("testCollection");
+    /*let test_ok = test_collection
+    .find_one()
+    .await?
+    .expect("Missing 'testitem' document.");*/
+    Ok("testitem successfully retrieved")
 }
 
 async fn upload_activity_handler() -> Result<impl Reply> {
