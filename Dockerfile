@@ -2,7 +2,10 @@ FROM rust:1.66.1 as builder
 
 RUN USER=root cargo new --bin gpsfitnessapp
 WORKDIR ./gpsfitnessapp
+COPY ./.cargo .cargo
+COPY ./vendor vendor
 COPY ./Cargo.toml ./Cargo.toml
+COPY ./Cargo.lock ./Cargo.lock
 # RUN cargo build --release
 # RUN rm src/*.rs
 

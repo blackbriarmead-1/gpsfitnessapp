@@ -1,20 +1,22 @@
 //https://blog.logrocket.com/packaging-a-rust-web-service-using-docker/
 //docker build -t rust-debian -f Dockerfile .
+//https://github.com/Mr-Malomz/rocket-mongo-api/tree/main/src
+//https://dev.to/hackmamba/build-a-rest-api-with-rust-and-mongodb-rocket-version-ah5
+//https://stackoverflow.com/questions/53887738/server-selection-timeout-error-mongodb-go-driver-with-docker
 
-use mongodb::{self, Client};
-use warp::{Filter, Rejection, Reply};
+mod models;
+
+use models::activity_model::Activity;
+use mongodb::{
+    self, bson::doc, options::ClientOptions, results::InsertOneResult, Client, Database,
+};
+use serde;
+use warp::{http, reject, Filter, Rejection, Reply};
 
 type Result<T> = std::result::Result<T, Rejection>;
 
 #[tokio::main]
 async fn main() {
-    let client = Client::with_uri_str("mongodb://localhost:27017")
-        .await
-        .expect("unable to connect to database");
-
-    let database = client.database("test");
-    println!("database name: {}", database.name());
-
     let health_route = warp::path!("health").and_then(health_handler);
 
     let retrieve_activity_route =
@@ -34,6 +36,14 @@ async fn health_handler() -> Result<impl Reply> {
     Ok("OK")
 }
 
+pub async fn get_mongo_connection() -> Database {
+    let client = Client::with_uri_str("mongodb://mongodb:27017")
+        .await
+        .unwrap();
+
+    client.database("test")
+}
+
 async fn retrieve_activity_handler() -> Result<impl Reply> {
     //let test_collection = client.database("test").collection("testCollection");
     /*let test_ok = test_collection
@@ -44,5 +54,23 @@ async fn retrieve_activity_handler() -> Result<impl Reply> {
 }
 
 async fn upload_activity_handler() -> Result<impl Reply> {
-    Ok("OK")
+    println!("running upload activity handler");
+    let database = get_mongo_connection().await;
+    println!("got database connection");
+    let test_collection = database.collection("testCollection");
+    println!("got test_collection");
+
+    let new_doc = Activity {
+        id: None,
+        length: 10.0,
+        activity_title: "outdoor run".to_string(),
+    };
+    println!("new doc initialized");
+
+    let result = test_collection.insert_one(new_doc, None).await;
+    println!("result done awaiting");
+    match result {
+        Ok(_) => Ok("Successfully uploaded activity"),
+        Err(_) => Err(reject()),
+    }
 }
