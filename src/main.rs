@@ -64,6 +64,8 @@ async fn upload_activity_handler() -> Result<impl Reply> {
         id: None,
         length: 10.0,
         activity_title: "outdoor run".to_string(),
+        gps: None,
+        hr: None,
     };
     println!("new doc initialized");
 
