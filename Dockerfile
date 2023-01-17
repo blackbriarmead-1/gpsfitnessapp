@@ -6,10 +6,18 @@ COPY ./.cargo .cargo
 COPY ./vendor vendor
 COPY ./Cargo.toml ./Cargo.toml
 COPY ./Cargo.lock ./Cargo.lock
-# RUN cargo build --release
-# RUN rm src/*.rs
 
-COPY . ./
+#dummy build to cache dependencies
+#make dummy main.rs file
+RUN echo 'fn main() { println!("Dummy!"); }' > ./src/main.rs
+RUN cargo build --release
+RUN rm src/*.rs
+
+COPY ./src ./src
+
+# The last modified attribute of main.rs needs to be updated manually,
+# otherwise cargo won't rebuild it.
+RUN touch -a -m ./src/main.rs
 
 #RUN rm ./target/release/deps/rust_docker_web*
 RUN cargo build --release

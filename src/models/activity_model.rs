@@ -16,7 +16,9 @@ pub struct Activity {
     pub length: f64,
     pub activity_title: String,
     //time series data:
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub gps: Option<Vec<GPSTS>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub hr: Option<Vec<HRTS>>,
 }
 

@@ -6,9 +6,12 @@
 
 mod models;
 
+use chrono::{Utc, TimeZone};
 use models::activity_model::Activity;
+use models::GPSTS_model::GPSTS;
+use models::HRTS_model::HRTS;
 use mongodb::{
-    self, bson::doc, options::ClientOptions, results::InsertOneResult, Client, Database,
+    self, bson::{doc, DateTime}, options::ClientOptions, results::InsertOneResult, Client, Database,
 };
 use serde;
 use warp::{http, reject, Filter, Rejection, Reply};
@@ -45,12 +48,7 @@ pub async fn get_mongo_connection() -> Database {
 }
 
 async fn retrieve_activity_handler() -> Result<impl Reply> {
-    //let test_collection = client.database("test").collection("testCollection");
-    /*let test_ok = test_collection
-    .find_one()
-    .await?
-    .expect("Missing 'testitem' document.");*/
-    Ok("testitem successfully retrieved")
+    Ok("OK")
 }
 
 async fn upload_activity_handler() -> Result<impl Reply> {
@@ -60,10 +58,19 @@ async fn upload_activity_handler() -> Result<impl Reply> {
     let test_collection = database.collection("testCollection");
     println!("got test_collection");
 
+    /*let mut gpsvec = vec![];
+    let gpsitem = GPSTS{
+        timestamp: None,
+        lat: 0.0,
+        lon: 0.0,
+    };
+    gpsvec.push(gpsitem);*/
+
     let new_doc = Activity {
         id: None,
         length: 10.0,
         activity_title: "outdoor run".to_string(),
+        //gps: gpsvec,
         gps: None,
         hr: None,
     };

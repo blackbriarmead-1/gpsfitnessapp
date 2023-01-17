@@ -410,6 +410,7 @@ dependencies = [
 name = "gpsfitnessapp"
 version = "0.0.1"
 dependencies = [
+ "chrono",
  "mongodb",
  "serde",
  "tokio",
