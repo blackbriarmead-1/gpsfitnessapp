@@ -20,11 +20,19 @@ type Result<T> = std::result::Result<T, Rejection>;
 
 #[tokio::main]
 async fn main() {
-    let health_route = warp::path!("health").and_then(health_handler);
+    let health_route =
+        warp::get()
+        .and(warp::path!("health"))
+        .and_then(health_handler);
 
     let retrieve_activity_route =
-        warp::path!("retrieve_activity").and_then(retrieve_activity_handler);
-    let upload_activity_route = warp::path!("upload_activity").and_then(upload_activity_handler);
+        warp::get()
+        .and(warp::path!("retrieve_activity"))
+        .and_then(retrieve_activity_handler);
+    let upload_activity_route = 
+        warp::post()
+        .and(warp::path!("upload_activity"))
+        .and_then(upload_activity_handler);
 
     let routes = health_route
         .or(retrieve_activity_route)
