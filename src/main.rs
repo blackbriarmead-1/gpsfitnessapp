@@ -6,12 +6,16 @@
 
 mod models;
 
-use chrono::{Utc, TimeZone};
+use chrono::{TimeZone, Utc};
 use models::activity_model::Activity;
 use models::GPSTS_model::GPSTS;
 use models::HRTS_model::HRTS;
 use mongodb::{
-    self, bson::{doc, DateTime}, options::ClientOptions, results::InsertOneResult, Client, Database,
+    self,
+    bson::{doc, DateTime},
+    options::ClientOptions,
+    results::InsertOneResult,
+    Client, Database,
 };
 use serde;
 use warp::{http, reject, Filter, Rejection, Reply};
@@ -20,18 +24,17 @@ type Result<T> = std::result::Result<T, Rejection>;
 
 #[tokio::main]
 async fn main() {
-    let health_route =
-        warp::get()
+    let health_route = warp::get()
         .and(warp::path!("health"))
         .and_then(health_handler);
 
-    let retrieve_activity_route =
-        warp::get()
+    let retrieve_activity_route = warp::get()
         .and(warp::path!("retrieve_activity"))
         .and_then(retrieve_activity_handler);
-    let upload_activity_route = 
-        warp::post()
+
+    let upload_activity_route = warp::post()
         .and(warp::path!("upload_activity"))
+        .and(json_body())
         .and_then(upload_activity_handler);
 
     let routes = health_route
@@ -41,6 +44,10 @@ async fn main() {
 
     println!("Started server at localhost:8000");
     warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
+}
+
+fn json_body() -> impl Filter<Extract = (Activity,), Error = warp::Rejection> + Clone {
+    warp::body::content_length_limit(1024 * 16).and(warp::body::json())
 }
 
 async fn health_handler() -> Result<impl Reply> {
@@ -59,12 +66,13 @@ async fn retrieve_activity_handler() -> Result<impl Reply> {
     Ok("OK")
 }
 
-async fn upload_activity_handler() -> Result<impl Reply> {
+async fn upload_activity_handler(activity: Activity) -> Result<impl Reply> {
     println!("running upload activity handler");
     let database = get_mongo_connection().await;
     println!("got database connection");
     let test_collection = database.collection("testCollection");
     println!("got test_collection");
+    println!("{}", activity.activity_title);
 
     /*let mut gpsvec = vec![];
     let gpsitem = GPSTS{
@@ -74,17 +82,17 @@ async fn upload_activity_handler() -> Result<impl Reply> {
     };
     gpsvec.push(gpsitem);*/
 
-    let new_doc = Activity {
+    /*let new_doc = Activity {
         id: None,
         length: 10.0,
         activity_title: "outdoor run".to_string(),
         //gps: gpsvec,
         gps: None,
         hr: None,
-    };
+    };*/
     println!("new doc initialized");
 
-    let result = test_collection.insert_one(new_doc, None).await;
+    let result = test_collection.insert_one(activity, None).await;
     println!("result done awaiting");
     match result {
         Ok(_) => Ok("Successfully uploaded activity"),
