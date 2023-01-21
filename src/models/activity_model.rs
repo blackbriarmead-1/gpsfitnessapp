@@ -1,7 +1,7 @@
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
-use super::{GPSTS_model::GPSTS, HRTS_model::HRTS};
+use super::{gpsts_model::GPSTS, hrts_model::HRTS};
 
 /*#[derive(Debug, Serialize, Deserialize)]
 enum TSData {

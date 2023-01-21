@@ -8,8 +8,8 @@ mod models;
 
 use chrono::{TimeZone, Utc};
 use models::activity_model::Activity;
-use models::GPSTS_model::GPSTS;
-use models::HRTS_model::HRTS;
+use models::gpsts_model::GPSTS;
+use models::hrts_model::HRTS;
 use mongodb::{
     self,
     bson::{doc, DateTime},
@@ -29,11 +29,11 @@ async fn main() {
         .and_then(health_handler);
 
     let retrieve_activity_route = warp::get()
-        .and(warp::path!("retrieve_activity"))
+        .and(warp::path!("activity"))
         .and_then(retrieve_activity_handler);
 
     let upload_activity_route = warp::post()
-        .and(warp::path!("upload_activity"))
+        .and(warp::path!("activity"))
         .and(json_body())
         .and_then(upload_activity_handler);
 
@@ -63,37 +63,23 @@ pub async fn get_mongo_connection() -> Database {
 }
 
 async fn retrieve_activity_handler() -> Result<impl Reply> {
-    Ok("OK")
+    let database = get_mongo_connection().await;
+    let test_collection: mongodb::Collection<Activity> = database.collection("testCollection");
+    let result = test_collection.find_one(None, None).await;
+
+    match result {
+        Ok(_) => {
+            let response = result.expect("does not contain activity").unwrap();
+            Ok(warp::reply::json(&response))
+        }
+        Err(_) => Err(reject()),
+    }
 }
 
 async fn upload_activity_handler(activity: Activity) -> Result<impl Reply> {
-    println!("running upload activity handler");
     let database = get_mongo_connection().await;
-    println!("got database connection");
     let test_collection = database.collection("testCollection");
-    println!("got test_collection");
-    println!("{}", activity.activity_title);
-
-    /*let mut gpsvec = vec![];
-    let gpsitem = GPSTS{
-        timestamp: None,
-        lat: 0.0,
-        lon: 0.0,
-    };
-    gpsvec.push(gpsitem);*/
-
-    /*let new_doc = Activity {
-        id: None,
-        length: 10.0,
-        activity_title: "outdoor run".to_string(),
-        //gps: gpsvec,
-        gps: None,
-        hr: None,
-    };*/
-    println!("new doc initialized");
-
     let result = test_collection.insert_one(activity, None).await;
-    println!("result done awaiting");
     match result {
         Ok(_) => Ok("Successfully uploaded activity"),
         Err(_) => Err(reject()),
