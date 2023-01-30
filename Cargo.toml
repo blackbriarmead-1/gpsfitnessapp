@@ -10,3 +10,4 @@ warp = "0.3.3"
 mongodb = { version = "2.3.1"}
 chrono = "0.4.23"
 futures-util = "0.3"
+openssl = "0.10"
