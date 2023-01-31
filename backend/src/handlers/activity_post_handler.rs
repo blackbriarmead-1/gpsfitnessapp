@@ -1,4 +1,5 @@
-use crate::{get_mongo_connection, Activity};
+use crate::{Activity};
+use crate::util::util::get_mongo_connection;
 
 pub async fn activity_post(activity: Activity) -> Result<impl warp::Reply, warp::Rejection> {
     let database = get_mongo_connection().await;

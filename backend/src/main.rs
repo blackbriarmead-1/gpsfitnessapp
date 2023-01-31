@@ -11,6 +11,7 @@ mod api;
 mod handlers;
 mod models;
 mod routes;
+mod util;
 use models::{activity_me_options::ActivityMeOptions, activity_model::Activity, oid_model::OIDS};
 use mongodb::{self, Client, Database};
 use warp::{Filter, Rejection};
@@ -28,13 +29,12 @@ use self::{
     },
 };
 
-#[macro_export]
-macro_rules! json_body {
-    ($input:expr) => {
-        warp::body::content_length_limit(1024 * 16).and(warp::body::json())
-    };
-}
-
+/// This is the main function for the webserver
+/// 
+/// To establish each endpoint, a macro, defined in the /api folder
+/// is called. Each file in /api glues together a route from /routes and
+/// a handler from /handlers, and packages it in a nice macro format which increases
+/// readability in the main function
 #[tokio::main]
 async fn main() {
     let routes = health_get!()
@@ -46,12 +46,4 @@ async fn main() {
 
     println!("Started server at localhost:8000");
     warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
-}
-
-pub async fn get_mongo_connection() -> Database {
-    let client = Client::with_uri_str("mongodb://mongodb:27017")
-        .await
-        .unwrap();
-
-    client.database("test")
 }

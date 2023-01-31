@@ -1,4 +1,5 @@
-use crate::{get_mongo_connection, Activity, ActivityMeOptions};
+use crate::{Activity, ActivityMeOptions};
+use crate::util::util::get_mongo_connection;
 use futures_util::stream::StreamExt;
 use mongodb::{self, bson::doc};
 

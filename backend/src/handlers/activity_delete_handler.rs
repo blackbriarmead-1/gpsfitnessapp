@@ -1,4 +1,5 @@
-use crate::{get_mongo_connection, Activity, OIDS};
+use crate::{Activity, OIDS};
+use crate::util::util::get_mongo_connection;
 
 use mongodb::{self, bson::doc};
 
